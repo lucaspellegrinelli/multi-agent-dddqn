@@ -31,6 +31,10 @@ Each square has a different "success probability" and these probabilities are hi
 
 Along with the "drawing" action (where you try to draw your symbol into a square), you can also do a "checking" action, where you can check what's the "success probability" of a given square. This action always succeeds, and only the player who used the action has access to this information.
 
+<p align="center">
+    <img src="https://i.imgur.com/fWOCmJS.png" width=500>
+</p>
+
 ## Training
 
 In each game of training, firstly a random agent between `[DDDQN Agent 1], [DDDQN Agent 2], [Random Agent]` was chosen to play as `X` and then another random agent was chosen to play as `O`. They then played the game and the DDDQN agents learned from that.
