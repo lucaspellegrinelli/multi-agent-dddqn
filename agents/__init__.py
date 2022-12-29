@@ -1,3 +1,3 @@
 from .dddqnagent import DDDQNAgent
-from .randomagent import RandomAgent
+from .randomagent import SnakeRandomAgent
 from .base import Agent
