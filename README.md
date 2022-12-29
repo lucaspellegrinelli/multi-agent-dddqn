@@ -6,26 +6,30 @@ The goal for this project is to implement a machine learning model that could pl
 
 This serves two porpouses:
 
-1. **Help with learning**. Since a neural network is a deterministic algorithm (i.e. if you run 2 identical inputs through it, the output would be the same), if you make 2 neural networks play against each other, the game played will always be the same everytime if there's no randomness in the envirorment itself.
-2. **Making the envirorment harder**. I didn't want the game the agents played to be trivial. Adding randomness to it gives a "expected value" aspect to the strategy (i.e. the agents need to play knowing that the moves might not turn out exactly as they planned, changing the optimal strategy).
+1. **Help with learning**. Since a neural network is a deterministic algorithm (i.e. if you run 2 identical inputs through it, the output would be the same), if you make 2 neural networks play against each other, the game played will always be the same every time if there's no randomness in the environment itself.
+2. **Making the envirorment harder**. I didn't want the game the agents played to be trivial. Adding randomness to it gives an "expected value" aspect to the strategy (i.e. the agents need to play knowing that the moves might not turn out exactly as they planned, changing the optimal strategy).
 
 ### Imperfect Information
 
-A game with imperfect information means that each player has access to different information. One example of this is Poker, where each player can only know the cards on the table and on their hand, but not in the other player hand. I really like games with this characteristic so I wanted a game with this aspect to it as well.
+A game with imperfect information means that each player has access to different information. One example of this is Poker, where each player can only know the cards on the table and on their hand, but not in the other player hand. I really like games with this characteristic, so I wanted a game with this aspect to it as well.
 
 ## The game
 
-One of the easiest games to implement and play is TicTacToe. The problem is that it is very easy to solve, doesn't have randomness and it has perfect information. That won't work here.
+One of the easiest games to implement and play is Tic-tac-toe. The problem is that it is very easy to solve, doesn't have randomness, and it has perfect information. That won't work here.
 
-I then created a new version of TicTacToe that changes all of that.
+I then created a new version of Tic-tac-toe that changes all of that.
 
 ### Modified Tic Tac Toe
 
-The objective of the game still the same: have a straight line of 3 symbols in the board. The thing is that you can't simply draw your symbol into the square you want. For each draw action, there's a probability of that action succeding that is defined by the "success probability of that square".
+<p align="center">
+  <img src="https://i.imgur.com/6BaW8hA.png" width=600/>
+</p>
 
-Each square has a different "success probability" and these probabilities are hidden from the players in the beggining of the game. These probabilities also change from game to game.
+The objective of the game still the same: have a straight line of 3 symbols in the board. The thing is that you can't simply draw your symbol into the square you want. For each draw action, there's a probability of that action succeeding that is defined by the "success probability of that square".
 
-Along with the "drawing" action (where you try to draw your symbol into a square), you can also do a "checking" action, where you can check what's the "success probability" of a given square. This action always succeeds and only the player who used the action has access to this information.
+Each square has a different "success probability" and these probabilities are hidden from the players in the beginning of the game. These probabilities also change from game to game.
+
+Along with the "drawing" action (where you try to draw your symbol into a square), you can also do a "checking" action, where you can check what's the "success probability" of a given square. This action always succeeds, and only the player who used the action has access to this information.
 
 ## Training
 
