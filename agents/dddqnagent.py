@@ -6,13 +6,20 @@ import numpy as np
 from agents.base import Agent
 
 class DuelingDeepQNetwork(nn.Module):
-    def __init__(self, n_actions: int, input_shape: list[int] | tuple[int], lr: float = 1e-4):
+    def __init__(self, n_actions: int, lr: float = 1e-4):
         super(DuelingDeepQNetwork, self).__init__()
 
+        # create a convolutional sequential model
         self.model = nn.Sequential(
-            nn.Linear(*input_shape, 256),
+            # 10 x 10 x 1
+            nn.Conv2d(1, 32, kernel_size=3), # 8 x 8 x 32
             nn.ReLU(),
-            nn.Linear(256, 256),
+            nn.Conv2d(32, 32, kernel_size=3), # 6 x 6 x 32
+            nn.ReLU(),
+            nn.Conv2d(32, 32, kernel_size=3), # 4 x 4 x 32
+            nn.ReLU(),
+            nn.Flatten(), # 512
+            nn.Linear(512, 256),
             nn.ReLU()
         )
 
@@ -75,7 +82,7 @@ class DDDQNAgent(Agent):
         assert observation.shape == tuple(self.observation_shape), f"Observation shape {observation.shape} does not match expected shape {self.observation_shape}"
 
         if np.random.random() > self.epsilon:
-            state = torch.tensor(np.expand_dims(observation, axis=0), dtype=torch.float).to(self.device)
+            state = torch.tensor(np.expand_dims(observation.copy(), axis=0), dtype=torch.float).to(self.device)
             _, adv = self.qnet.forward(state)
             return torch.argmax(adv).item()
 

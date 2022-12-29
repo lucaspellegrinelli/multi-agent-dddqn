@@ -16,9 +16,11 @@ class Snake:
     MOVE_LEFT = 2
     MOVE_RIGHT = 3
 
-    def __init__(self, board_size: int = 10, n_steps: int = 500):
-        self.board_size = board_size
+    BOARD_SIZE = 10
+
+    def __init__(self, n_steps: int = 500):
         self.n_steps = n_steps
+        self.board_size = self.BOARD_SIZE
         self.reset()
 
     def reset(self):
@@ -97,24 +99,20 @@ class Snake:
 
     def observation(self, agent: int):
         if agent == self.AGENT_A_ID:
-            return self.board.flatten()
+            return np.expand_dims(self.board, axis=0).copy()
         elif agent == self.AGENT_B_ID:
-            flipped = np.flip(self.board, axis=0).flatten()
-            a_head_pos = np.where(flipped == self.AGENT_A_HEAD_ID)[0][0]
-            b_head_pos = np.where(flipped == self.AGENT_B_HEAD_ID)[0][0]
+            flipped = np.flip(self.board.copy(), axis=0)
+            flipped_copy = flipped.copy()
 
-            a_body_pos = np.where(flipped == self.AGENT_A_BODY_ID)[0]
-            b_body_pos = np.where(flipped == self.AGENT_B_BODY_ID)[0]
+            # flip agent heads
+            flipped[flipped_copy == self.AGENT_A_HEAD_ID] = self.AGENT_B_HEAD_ID
+            flipped[flipped_copy == self.AGENT_B_HEAD_ID] = self.AGENT_A_HEAD_ID
 
-            flipped[a_head_pos] = self.AGENT_B_HEAD_ID
-            flipped[b_head_pos] = self.AGENT_A_HEAD_ID
+            # flip agent bodies
+            flipped[flipped_copy == self.AGENT_A_BODY_ID] = self.AGENT_B_BODY_ID
+            flipped[flipped_copy == self.AGENT_B_BODY_ID] = self.AGENT_A_BODY_ID
 
-            for pos in a_body_pos:
-                flipped[pos] = self.AGENT_B_BODY_ID
-            for pos in b_body_pos:
-                flipped[pos] = self.AGENT_A_BODY_ID
-
-            return flipped
+            return np.expand_dims(flipped, axis=0)
 
     def is_game_ended(self):
         return self.step_count > self.n_steps or not self.all_agents_alive()
@@ -144,7 +142,7 @@ class Snake:
 
     @staticmethod
     def observation_size():
-        return 10 * 10
+        return (1, Snake.BOARD_SIZE, Snake.BOARD_SIZE)
 
     def __repr__(self):
         return str(self.board)

@@ -22,9 +22,9 @@ def build_agent(cold_start: bool = True):
 
     return DDDQNAgent(
         n_actions=n_actions,
-        observation_shape=[obs_size],
-        qnet=DuelingDeepQNetwork(n_actions=n_actions, input_shape=[obs_size], lr=1e-5).to(device),
-        target_qnet=DuelingDeepQNetwork(n_actions=n_actions, input_shape=[obs_size], lr=1e-5).to(device),
+        observation_shape=obs_size,
+        qnet=DuelingDeepQNetwork(n_actions=n_actions, lr=1e-5).to(device),
+        target_qnet=DuelingDeepQNetwork(n_actions=n_actions, lr=1e-5).to(device),
         batch_size=64,
         target_qnet_update_freq=2500,
         epsilon=1.0 if cold_start else 0.0,
