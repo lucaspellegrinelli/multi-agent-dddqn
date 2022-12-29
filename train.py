@@ -107,7 +107,7 @@ if __name__ == "__main__":
             if done_x or done_o:
                 break
 
-        if game_i % 250 == 0:
+        if game_i % 1000 == 0:
             if game_i != 0 and args.save:
                 os.makedirs("models/agent_a", exist_ok=True)
                 os.makedirs("models/agent_b", exist_ok=True)
