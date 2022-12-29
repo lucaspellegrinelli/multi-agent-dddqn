@@ -60,14 +60,14 @@ def play_game(agent_a: Agent, agent_b: Agent):
     return {
         "a_won": env.get_winner() == env.AGENT_A_ID,
         "b_won": env.get_winner() == env.AGENT_B_ID,
-        "ended_on_error": not env.all_agents_alive(),
+        "steps": env.step_count,
         "a_score": env.get_score(env.AGENT_A_ID),
         "b_score": env.get_score(env.AGENT_B_ID),
         "info": info,
     }
 
 def evaluate(agent_a: Agent, agent_b: Agent, n_games: int, shuffle: bool = True):
-    results = { "a_won": 0, "b_won": 0, "a_score": 0, "b_score": 0, "ended_on_error": 0 }
+    results = { "a_won": 0, "b_won": 0, "a_score": 0, "b_score": 0, "steps": 0 }
 
     for _ in range(n_games):
         a_first = not shuffle or np.random.uniform(0, 1) < 0.5
@@ -80,7 +80,7 @@ def evaluate(agent_a: Agent, agent_b: Agent, n_games: int, shuffle: bool = True)
         results["b_won"] += result["b_won"] if a_first else result["a_won"]
         results["a_score"] += result["a_score"]
         results["b_score"] += result["b_score"]
-        results["ended_on_error"] += result["ended_on_error"]
+        results["steps"] += result["steps"]
 
     return { key: value / n_games for key, value in results.items() }
 
@@ -123,29 +123,29 @@ if __name__ == "__main__":
             writer.add_scalar("a_vs_b_b_won", a_vs_b["b_won"], game_i)
             writer.add_scalar("a_vs_b_a_score", a_vs_b["a_score"], game_i)
             writer.add_scalar("a_vs_b_b_score", a_vs_b["b_score"], game_i)
-            writer.add_scalar("a_vs_b_ended_on_error", a_vs_b["ended_on_error"], game_i)
+            writer.add_scalar("a_vs_b_steps", a_vs_b["steps"], game_i)
 
             writer.add_scalar("a_vs_rnd_a_won", a_vs_rnd["a_won"], game_i)
             writer.add_scalar("a_vs_rnd_rnd_won", a_vs_rnd["b_won"], game_i)
             writer.add_scalar("a_vs_rnd_a_score", a_vs_rnd["a_score"], game_i)
             writer.add_scalar("a_vs_rnd_rnd_score", a_vs_rnd["b_score"], game_i)
-            writer.add_scalar("a_vs_rnd_ended_on_error", a_vs_rnd["ended_on_error"], game_i)
+            writer.add_scalar("a_vs_rnd_steps", a_vs_rnd["steps"], game_i)
 
             writer.add_scalar("b_vs_rnd_b_won", b_vs_rnd["a_won"], game_i)
             writer.add_scalar("b_vs_rnd_rnd_won", b_vs_rnd["b_won"], game_i)
             writer.add_scalar("b_vs_rnd_b_score", b_vs_rnd["a_score"], game_i)
             writer.add_scalar("b_vs_rnd_rnd_score", b_vs_rnd["b_score"], game_i)
-            writer.add_scalar("b_vs_rnd_ended_on_error", b_vs_rnd["ended_on_error"], game_i)
+            writer.add_scalar("b_vs_rnd_steps", b_vs_rnd["steps"], game_i)
 
             writer.add_scalar("epsilon_a", agent_0.epsilon, game_i)
             writer.add_scalar("epsilon_b", agent_1.epsilon, game_i)
 
             print(f"Episode {game_i:5d}")
             print(f" > Epsilon A    {agent_0.epsilon:5.2f} | Epsilon B   {agent_1.epsilon:5.2f}")
-            print(f" > Agent A vs Agent B | A Won {a_vs_b['a_won']:5.2f} | B Won {a_vs_b['b_won']:5.2f} | A Score {a_vs_b['a_score']:5.2f} | B Score {a_vs_b['b_score']:5.2f} | Ended on Error {a_vs_b['ended_on_error']:5.2f}")
-            print(f" > Agent A vs Random  | A Won {a_vs_rnd['a_won']:5.2f} | B Won {a_vs_rnd['b_won']:5.2f} | A Score {a_vs_rnd['a_score']:5.2f} | B Score {a_vs_rnd['b_score']:5.2f} | Ended on Error {a_vs_rnd['ended_on_error']:5.2f}")
-            print(f" > Agent B vs Random  | A Won {b_vs_rnd['a_won']:5.2f} | B Won {b_vs_rnd['b_won']:5.2f} | A Score {b_vs_rnd['a_score']:5.2f} | B Score {b_vs_rnd['b_score']:5.2f} | Ended on Error {b_vs_rnd['ended_on_error']:5.2f}")
-            print(f" > Random vs Random   | A Won {rnd_vs_rnd['a_won']:5.2f} | B Won {rnd_vs_rnd['b_won']:5.2f} | A Score {rnd_vs_rnd['a_score']:5.2f} | B Score {rnd_vs_rnd['b_score']:5.2f} | Ended on Error {rnd_vs_rnd['ended_on_error']:5.2f}")
+            print(f" > Agent A vs Agent B | A Won {a_vs_b['a_won']:5.2f} | B Won {a_vs_b['b_won']:5.2f} | A Score {a_vs_b['a_score']:5.2f} | B Score {a_vs_b['b_score']:5.2f} | Steps {a_vs_b['steps']:6.2f}")
+            print(f" > Agent A vs Random  | A Won {a_vs_rnd['a_won']:5.2f} | B Won {a_vs_rnd['b_won']:5.2f} | A Score {a_vs_rnd['a_score']:5.2f} | B Score {a_vs_rnd['b_score']:5.2f} | Steps {a_vs_rnd['steps']:6.2f}")
+            print(f" > Agent B vs Random  | A Won {b_vs_rnd['a_won']:5.2f} | B Won {b_vs_rnd['b_won']:5.2f} | A Score {b_vs_rnd['a_score']:5.2f} | B Score {b_vs_rnd['b_score']:5.2f} | Steps {b_vs_rnd['steps']:6.2f}")
+            print(f" > Random vs Random   | A Won {rnd_vs_rnd['a_won']:5.2f} | B Won {rnd_vs_rnd['b_won']:5.2f} | A Score {rnd_vs_rnd['a_score']:5.2f} | B Score {rnd_vs_rnd['b_score']:5.2f} | Steps {rnd_vs_rnd['steps']:6.2f}")
             print("")
 
     writer.flush()
