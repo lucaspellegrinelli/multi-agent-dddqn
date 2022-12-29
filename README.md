@@ -84,6 +84,11 @@ After every 250 training games, 1000 games were played between each pair os agen
   </tbody>
 </table>
 
+## Next Steps
+
+* Think of a cooler envirorment to make the agents play in.
+* Play around with another learning algorithm like PPO
+
 ## References
 
 Some resources I used while building this!
