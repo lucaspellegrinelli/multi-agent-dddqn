@@ -9,7 +9,9 @@ class SnakeRandomAgent(Agent):
         def _hit_something(obs_board, position):
             if position[0] < 0 or position[0] > 9 or position[1] < 0 or position[1] > 9:
                 return True
-            return obs_board[position[0], position[1]] != Snake.EMPTY_SQUARE
+
+            obs_value = obs_board[position[0], position[1]]
+            return obs_value != Snake.EMPTY_SQUARE and obs_value != Snake.FOOD_ID
 
         obs_board = observation[0]
 

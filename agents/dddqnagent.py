@@ -10,26 +10,26 @@ class DuelingDeepQNetwork(nn.Module):
         super(DuelingDeepQNetwork, self).__init__()
 
         # create a convolutional sequential model
-        self.model = nn.Sequential(
-            # 10 x 10 x 1
-            nn.Conv2d(1, 32, kernel_size=3), # 8 x 8 x 32
-            nn.ReLU(),
-            nn.Conv2d(32, 32, kernel_size=3), # 6 x 6 x 32
-            nn.ReLU(),
-            nn.Conv2d(32, 32, kernel_size=3), # 4 x 4 x 32
-            nn.ReLU(),
-            nn.Flatten(), # 512
-            nn.Linear(512, 256),
-            nn.ReLU()
-        )
-
         # self.model = nn.Sequential(
-        #     nn.Flatten(),
-        #     nn.Linear(100, 256),
+        #     # 10 x 10 x 1
+        #     nn.Conv2d(1, 32, kernel_size=3), # 8 x 8 x 32
         #     nn.ReLU(),
-        #     nn.Linear(256, 256),
+        #     nn.Conv2d(32, 32, kernel_size=3), # 6 x 6 x 32
+        #     nn.ReLU(),
+        #     nn.Conv2d(32, 32, kernel_size=3), # 4 x 4 x 32
+        #     nn.ReLU(),
+        #     nn.Flatten(), # 512
+        #     nn.Linear(512, 256),
         #     nn.ReLU()
         # )
+
+        self.model = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(100, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU()
+        )
 
         self.V = nn.Linear(256, 1)
         self.A = nn.Linear(256, n_actions)
