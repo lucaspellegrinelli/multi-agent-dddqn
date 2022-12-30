@@ -3,6 +3,7 @@ import torch
 import random
 import argparse
 import numpy as np
+import concurrent.futures
 from torch.utils.tensorboard import SummaryWriter
 
 from agents import SnakeRandomAgent, DDDQNAgent, Agent
@@ -33,11 +34,11 @@ def build_agent(cold_start: bool = True):
     )
 
 def play_game(agent_a: Agent, agent_b: Agent):
-    env = Snake()
+    env = Snake(n_steps=250)
 
     info = { "a": [], "b": [] }
 
-    while not env.is_game_ended():
+    while True:
         pre_obs_a = env.observation(env.AGENT_A_ID)
         action_a = agent_a.act(pre_obs_a)
         reward_a = env.step(env.AGENT_A_ID, action_a)
@@ -53,6 +54,9 @@ def play_game(agent_a: Agent, agent_b: Agent):
 
         info["a"].append({ "pre_obs": pre_obs_a, "action": action_a, "reward": reward_a, "obs": obs_a, "done": done })
         info["b"].append({ "pre_obs": pre_obs_b, "action": action_b, "reward": reward_b, "obs": obs_b, "done": done })
+
+        if done:
+            break
 
     return {
         "a_won": env.get_winner() == env.AGENT_A_ID,
@@ -82,6 +86,7 @@ def evaluate(agent_a: Agent, agent_b: Agent, n_games: int, shuffle: bool = True)
     return { key: value / n_games for key, value in results.items() }
 
 if __name__ == "__main__":
+    N_PROCESSES = 5
     writer = SummaryWriter()
 
     agent_0 = build_agent(not args.load)
@@ -91,20 +96,22 @@ if __name__ == "__main__":
         agent_0.load("models/agent_a/qnet.pth", "models/agent_a/target_qnet.pth")
         agent_1.load("models/agent_b/qnet.pth", "models/agent_b/target_qnet.pth")
 
-    for game_i in range(args.num_games):
-        # Randomly choose players for this game
-        player_a = random.choice([agent_0, agent_1, SnakeRandomAgent()])
-        player_b = random.choice([agent_0, agent_1, SnakeRandomAgent()])
+    for game_i in range(0, args.num_games, N_PROCESSES):
+        with concurrent.futures.ProcessPoolExecutor(max_workers=N_PROCESSES) as executor:
+            # Randomly choose players for this game
+            player_a = random.choice([agent_0, agent_1, SnakeRandomAgent()])
+            player_b = random.choice([agent_0, agent_1, SnakeRandomAgent()])
 
-        # Play game
-        game_info = play_game(player_a, player_b)
+            # Play games
+            game_infos = executor.map(play_game, [player_a] * N_PROCESSES, [player_b] * N_PROCESSES)
 
-        # Update agents
-        for info_a, info_b in zip(game_info["info"]["a"], game_info["info"]["b"]):
-            player_a.learn(info_a["pre_obs"], info_a["action"], info_a["reward"], info_a["obs"], info_a["done"])
-            player_b.learn(info_b["pre_obs"], info_b["action"], info_b["reward"], info_b["obs"], info_b["done"])
+            # Update agents
+            for game_info in game_infos:
+                for info_a, info_b in zip(game_info["info"]["a"], game_info["info"]["b"]):
+                    player_a.learn(info_a["pre_obs"], info_a["action"], info_a["reward"], info_a["obs"], info_a["done"])
+                    player_b.learn(info_b["pre_obs"], info_b["action"], info_b["reward"], info_b["obs"], info_b["done"])
 
-        if game_i % 2500 == 0:
+        if game_i % 1000 == 0:
             if game_i != 0 and args.save:
                 os.makedirs("models/agent_a", exist_ok=True)
                 os.makedirs("models/agent_b", exist_ok=True)
