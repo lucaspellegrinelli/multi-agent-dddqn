@@ -5,3 +5,4 @@ runs
 poetry.lock
 pyproject.toml
 .python-version
+test.py

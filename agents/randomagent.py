@@ -5,15 +5,13 @@ from .base import Agent
 from envirorment import Snake
 
 class SnakeRandomAgent(Agent):
-    def _hit_something(self, obs_board, position):
-        return position[0] < 0 or position[0] > 9 or position[1] < 0 or position[1] > 9 or \
-            obs_board[position[0], position[1]] == Snake.AGENT_B_HEAD_ID or \
-            obs_board[position[0], position[1]] == Snake.AGENT_B_BODY_ID or \
-            obs_board[position[0], position[1]] == Snake.AGENT_A_BODY_ID or \
-            obs_board[position[0], position[1]] == Snake.AGENT_A_HEAD_ID
-            
     def act(self, observation):
-        obs_board = np.reshape(observation, (10, 10))
+        def _hit_something(obs_board, position):
+            if position[0] < 0 or position[0] > 9 or position[1] < 0 or position[1] > 9:
+                return True
+            return obs_board[position[0], position[1]] != Snake.EMPTY_SQUARE
+
+        obs_board = observation[0]
 
         # find where agent a head is
         agent_a_head = np.where(obs_board == Snake.AGENT_A_HEAD_ID)
@@ -21,10 +19,10 @@ class SnakeRandomAgent(Agent):
 
         # check directions where agent_a can move
         valid_actions = []
-        up_will_hit = self._hit_something(obs_board, (agent_a_head[0] - 1, agent_a_head[1]))
-        down_will_hit = self._hit_something(obs_board, (agent_a_head[0] + 1, agent_a_head[1]))
-        left_will_hit = self._hit_something(obs_board, (agent_a_head[0], agent_a_head[1] - 1))
-        right_will_hit = self._hit_something(obs_board, (agent_a_head[0], agent_a_head[1] + 1))
+        up_will_hit = _hit_something(obs_board, (agent_a_head[0] - 1, agent_a_head[1]))
+        down_will_hit = _hit_something(obs_board, (agent_a_head[0] + 1, agent_a_head[1]))
+        left_will_hit = _hit_something(obs_board, (agent_a_head[0], agent_a_head[1] - 1))
+        right_will_hit = _hit_something(obs_board, (agent_a_head[0], agent_a_head[1] + 1))
         
         if not up_will_hit:
             valid_actions.append(Snake.MOVE_UP)

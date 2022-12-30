@@ -43,13 +43,6 @@ class Snake:
 
         self.step_count += 1
 
-        # invert action if agent is agent B
-        if agent == self.AGENT_B_ID:
-            if action == self.MOVE_UP:
-                action = self.MOVE_DOWN
-            elif action == self.MOVE_DOWN:
-                action = self.MOVE_UP
-
         if action == self.MOVE_UP:
             new_position = (self.agent_positions[agent][-1][0] - 1, self.agent_positions[agent][-1][1])
         elif action == self.MOVE_DOWN:
@@ -101,20 +94,19 @@ class Snake:
 
     def observation(self, agent: int):
         if agent == self.AGENT_A_ID:
-            return np.expand_dims(self.board, axis=0).copy()
+            return np.array([self.board])
         elif agent == self.AGENT_B_ID:
-            flipped = np.flip(self.board.copy(), axis=0)
-            flipped_copy = flipped.copy()
+            flipped_board = self.board.copy()
 
             # flip agent heads
-            flipped[flipped_copy == self.AGENT_A_HEAD_ID] = self.AGENT_B_HEAD_ID
-            flipped[flipped_copy == self.AGENT_B_HEAD_ID] = self.AGENT_A_HEAD_ID
+            flipped_board[self.board == self.AGENT_A_HEAD_ID] = self.AGENT_B_HEAD_ID
+            flipped_board[self.board == self.AGENT_B_HEAD_ID] = self.AGENT_A_HEAD_ID
 
             # flip agent bodies
-            flipped[flipped_copy == self.AGENT_A_BODY_ID] = self.AGENT_B_BODY_ID
-            flipped[flipped_copy == self.AGENT_B_BODY_ID] = self.AGENT_A_BODY_ID
+            flipped_board[self.board == self.AGENT_A_BODY_ID] = self.AGENT_B_BODY_ID
+            flipped_board[self.board == self.AGENT_B_BODY_ID] = self.AGENT_A_BODY_ID
 
-            return np.expand_dims(flipped, axis=0)
+            return np.array([flipped_board])
 
     def is_game_ended(self):
         return self.step_count > self.n_steps or not self.all_agents_alive()
