@@ -37,9 +37,9 @@ class Snake:
             self.AGENT_B_ID: [(self.board_size - 1, self.board_size - 1)]
         }
 
-    def step(self, agent: int, action: int):
+    def step(self, agent: int, action: int) -> int:
         if not self.agent_alives[agent]:
-            return
+            return -1
 
         self.step_count += 1
 
@@ -62,7 +62,7 @@ class Snake:
         # check if new position is valid
         if new_position[0] < 0 or new_position[0] >= self.board_size or new_position[1] < 0 or new_position[1] >= self.board_size:
             self.agent_alives[agent] = False
-            return
+            return -1
 
         # check if new position is food
         ate_food = False
@@ -76,7 +76,7 @@ class Snake:
         is_other_agent_body = new_pos_content == self.AGENT_A_BODY_ID or new_pos_content == self.AGENT_B_BODY_ID
         if is_other_agent_head or is_other_agent_body:
             self.agent_alives[agent] = False
-            return
+            return -1
 
         # update board
         prev_head_pos = self.agent_positions[agent][-1]
@@ -89,6 +89,8 @@ class Snake:
         else:
             self.board[self.agent_positions[agent][0]] = self.EMPTY_SQUARE
             self.agent_positions[agent].pop(0)
+        
+        return 1 if ate_food else 0
         
     def add_food(self):
         while True:
@@ -119,10 +121,6 @@ class Snake:
 
     def all_agents_alive(self):
         return all([self.agent_alives[agent] for agent in self.agent_alives])
-
-    def get_reward(self, agent: int):
-        other_agent = self.AGENT_A_ID if agent == self.AGENT_B_ID else self.AGENT_B_ID
-        return self.agent_foods[agent] - self.agent_foods[other_agent]
 
     def get_score(self, agent: int):
         return self.agent_foods[agent]

@@ -23,6 +23,14 @@ class DuelingDeepQNetwork(nn.Module):
             nn.ReLU()
         )
 
+        # self.model = nn.Sequential(
+        #     nn.Flatten(),
+        #     nn.Linear(100, 256),
+        #     nn.ReLU(),
+        #     nn.Linear(256, 256),
+        #     nn.ReLU()
+        # )
+
         self.V = nn.Linear(256, 1)
         self.A = nn.Linear(256, n_actions)
 

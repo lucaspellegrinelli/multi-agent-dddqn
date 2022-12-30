@@ -12,7 +12,7 @@ from envirorment import Snake
 parser = argparse.ArgumentParser()
 parser.add_argument("--load", action="store_true", help="Load models from disk")
 parser.add_argument("--save", action="store_true", help="Save models to disk")
-parser.add_argument("--num_games", type=int, default=50000, help="Number of games to play")
+parser.add_argument("--num_games", type=int, default=1000000, help="Number of games to play")
 args = parser.parse_args()
 
 def build_agent(cold_start: bool = True):
@@ -26,7 +26,7 @@ def build_agent(cold_start: bool = True):
         qnet=DuelingDeepQNetwork(n_actions=n_actions, lr=1e-4).to(device),
         target_qnet=DuelingDeepQNetwork(n_actions=n_actions, lr=1e-4).to(device),
         batch_size=64,
-        target_qnet_update_freq=2500,
+        target_qnet_update_freq=5000,
         epsilon=1.0 if cold_start else 0.0,
         eps_dec=1e-4,
         eps_min=0,
@@ -40,14 +40,11 @@ def play_game(agent_a: Agent, agent_b: Agent):
     while not env.is_game_ended():
         pre_obs_a = env.observation(env.AGENT_A_ID)
         action_a = agent_a.act(pre_obs_a)
-        env.step(env.AGENT_A_ID, action_a)
+        reward_a = env.step(env.AGENT_A_ID, action_a)
 
         pre_obs_b = env.observation(env.AGENT_B_ID)
         action_b = agent_b.act(pre_obs_b)
-        env.step(env.AGENT_B_ID, action_b)
-
-        reward_a = env.get_reward(env.AGENT_A_ID)
-        reward_b = env.get_reward(env.AGENT_B_ID)
+        reward_b = env.step(env.AGENT_B_ID, action_b)
 
         obs_a = env.observation(env.AGENT_A_ID)
         obs_b = env.observation(env.AGENT_B_ID)
@@ -107,7 +104,7 @@ if __name__ == "__main__":
             player_a.learn(info_a["pre_obs"], info_a["action"], info_a["reward"], info_a["obs"], info_a["done"])
             player_b.learn(info_b["pre_obs"], info_b["action"], info_b["reward"], info_b["obs"], info_b["done"])
 
-        if game_i % 1000 == 0:
+        if game_i % 2500 == 0:
             if game_i != 0 and args.save:
                 os.makedirs("models/agent_a", exist_ok=True)
                 os.makedirs("models/agent_b", exist_ok=True)
