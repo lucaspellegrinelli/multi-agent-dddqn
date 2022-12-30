@@ -4,3 +4,4 @@ plots
 runs
 poetry.lock
 pyproject.toml
+.python-version
